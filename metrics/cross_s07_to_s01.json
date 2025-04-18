@@ -1,0 +1,8 @@
+{
+  "train_subject": 7,
+  "test_subject": 1,
+  "accuracy": 0.25,
+  "precision": 0.2426122790253225,
+  "recall": 0.25,
+  "f1": 0.22709615915207973
+}
