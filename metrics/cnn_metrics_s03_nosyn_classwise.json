@@ -1,0 +1,26 @@
+{
+  "Left Hand": {
+    "precision": 0.2641509433962264,
+    "recall": 0.9333333333333333,
+    "f1-score": 0.4117647058823529,
+    "support": 15.0
+  },
+  "Right Hand": {
+    "precision": 1.0,
+    "recall": 0.07142857142857142,
+    "f1-score": 0.13333333333333333,
+    "support": 14.0
+  },
+  "Both Feet": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1-score": 0.0,
+    "support": 15.0
+  },
+  "Tongue": {
+    "precision": 0.25,
+    "recall": 0.07142857142857142,
+    "f1-score": 0.1111111111111111,
+    "support": 14.0
+  }
+}
