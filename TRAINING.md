@@ -96,8 +96,8 @@ dataset/
 
 | File | Labels? | Use |
 |------|---------|-----|
-| `A0{N}T.gdf` | ✅ Yes (events 769–772) | Training and evaluation |
-| `A0{N}E.gdf` | ❌ No (event 783) | **Not used** |
+| `A0{N}T.gdf` | Yes (events 769–772) | Training and evaluation |
+| `A0{N}E.gdf` | No (event 783) | **Not used** |
 
 **Do not modify any files in `dataset/`.**
 
