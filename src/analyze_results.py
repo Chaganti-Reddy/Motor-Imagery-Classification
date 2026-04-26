@@ -36,7 +36,7 @@ METRICS = ["accuracy", "precision", "recall", "f1"]
 
 
 def _save(fig: plt.Figure, path: str, label: str = "") -> None:
-    fig.savefig(path, dpi=150, bbox_inches="tight")
+    fig.savefig(path, dpi=300, bbox_inches="tight")
     plt.close(fig)
     name = label or Path(path).name
     print(f"  {name}")
@@ -133,8 +133,6 @@ def plot_single_metric_bar(df: pd.DataFrame, metric: str, save_path: str) -> Non
     ax.set_xticks(x); ax.set_xticklabels(df["label"], fontsize=11)
     ax.set_xlabel("Subject", fontsize=12)
     ax.set_ylabel(f"{metric.capitalize()} (%)", fontsize=12)
-    ax.set_title(f"Per-Subject {metric.capitalize()} — WGAN-GP + CNN",
-                 fontsize=14, fontweight="bold")
     ax.set_ylim(0, 110); ax.legend(fontsize=11); ax.grid(axis="y", alpha=0.35)
     plt.tight_layout()
     _save(fig, save_path, f"summary_{metric}_bar.png")
@@ -148,9 +146,8 @@ def plot_grouped_metrics(df: pd.DataFrame, save_path: str) -> None:
         ax.bar(x + (i - n_m / 2 + 0.5) * w, df[m].values * 100, w,
                label=m.capitalize(), color=col, alpha=0.85, edgecolor="white")
     ax.set_xticks(x); ax.set_xticklabels(df["label"], fontsize=11)
-    ax.set_xlabel("Subject", fontsize=12); ax.set_ylabel("Score (%)", fontsize=12)
-    ax.set_title("Accuracy / Precision / Recall / F1 — All Subjects",
-                 fontsize=14, fontweight="bold")
+    ax.set_xlabel("Subject", fontsize=12)
+    ax.set_ylabel("Score (%)", fontsize=12)
     ax.set_ylim(0, 115); ax.legend(fontsize=11); ax.grid(axis="y", alpha=0.3)
     plt.tight_layout(); _save(fig, save_path, "summary_metrics_grouped.png")
 
@@ -164,16 +161,24 @@ def plot_boxplots(df: pd.DataFrame, save_path: str) -> None:
                    boxprops=dict(facecolor=METRIC_COLOURS[m], alpha=0.7),
                    medianprops=dict(color="black", linewidth=2),
                    whiskerprops=dict(linewidth=1.5), capprops=dict(linewidth=1.5))
-        ax.scatter(1 + rng.uniform(-0.12, 0.12, len(vals)), vals,
-                   color="black", alpha=0.6, s=35, zorder=5)
-        ax.set_title(m.capitalize(), fontsize=12, fontweight="bold")
+        ax.scatter(
+            1 + rng.uniform(-0.12, 0.12, len(vals)),
+            vals,
+            color="black",
+            alpha=0.6,
+            s=35,
+            zorder=5,
+        )
         ax.set_ylim(0, 110); ax.set_xticks([1]); ax.set_xticklabels([""])
         ax.grid(axis="y", alpha=0.3)
-        ax.text(1.0, 2, f"μ={vals.mean():.1f}\nσ={vals.std():.1f}",
-                ha="center", fontsize=9,
-                bbox=dict(boxstyle="round", facecolor="lightyellow", alpha=0.8))
-    plt.suptitle("Metric Distribution Across All Subjects",
-                 fontsize=13, fontweight="bold")
+        ax.text(
+            1.0,
+            2,
+            f"μ={vals.mean():.1f}\nσ={vals.std():.1f}",
+            ha="center",
+            fontsize=9,
+            bbox=dict(boxstyle="round", facecolor="lightyellow", alpha=0.8),
+        )
     plt.tight_layout(); _save(fig, save_path, "summary_metrics_boxplot.png")
 
 
@@ -182,10 +187,14 @@ def plot_violin(df: pd.DataFrame, save_path: str) -> None:
                    var_name="Metric", value_name="Score")
     long["Score"] *= 100
     fig, ax = plt.subplots(figsize=(10, 5))
-    sns.violinplot(data=long, x="Metric", y="Score",
-                   palette=list(METRIC_COLOURS.values()), inner="point", ax=ax)
-    ax.set_title("Score Distribution (Violin) — All Subjects",
-                 fontsize=13, fontweight="bold")
+    sns.violinplot(
+        data=long,
+        x="Metric",
+        y="Score",
+        palette=list(METRIC_COLOURS.values()),
+        inner="point",
+        ax=ax,
+    )
     ax.set_ylabel("Score (%)"); ax.set_ylim(0, 110); ax.grid(axis="y", alpha=0.3)
     plt.tight_layout(); _save(fig, save_path, "summary_violin.png")
 
@@ -201,9 +210,9 @@ def plot_mean_std_bar(df: pd.DataFrame, save_path: str) -> None:
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + sd + 0.5,
                 f"{mu:.2f}±{sd:.2f}", ha="center", va="bottom",
                 fontsize=10, fontweight="bold")
-    ax.set_ylim(0, 115); ax.set_ylabel("Score (%)"); ax.grid(axis="y", alpha=0.3)
-    ax.set_title("Mean ± Std Metrics Across All Subjects",
-                 fontsize=13, fontweight="bold")
+    ax.set_ylim(0, 115)
+    ax.set_ylabel("Score (%)")
+    ax.grid(axis="y", alpha=0.3)
     plt.tight_layout(); _save(fig, save_path, "summary_mean_std.png")
 
 
@@ -222,8 +231,6 @@ def plot_ranked_accuracy(df: pd.DataFrame, save_path: str) -> None:
         ax.text(bar.get_width() + 0.4, bar.get_y() + bar.get_height() / 2,
                 f"{v*100:.1f}%", va="center", fontsize=9)
     ax.set_xlabel("Accuracy (%)", fontsize=12)
-    ax.set_title("Subjects Ranked by Accuracy (WGAN-GP + CNN)",
-                 fontsize=13, fontweight="bold")
     ax.legend(fontsize=10); ax.set_xlim(0, 110); ax.grid(axis="x", alpha=0.3)
     plt.tight_layout(); _save(fig, save_path, "summary_ranked.png")
 
@@ -231,10 +238,17 @@ def plot_ranked_accuracy(df: pd.DataFrame, save_path: str) -> None:
 def plot_all_metrics_heatmap(df: pd.DataFrame, save_path: str) -> None:
     heat = df.set_index("label")[METRICS] * 100
     fig, ax = plt.subplots(figsize=(8, 6))
-    sns.heatmap(heat, annot=True, fmt=".1f", cmap="YlGnBu",
-                vmin=0, vmax=100, linewidths=0.5, ax=ax, annot_kws={"size": 11})
-    ax.set_title("All Metrics × All Subjects (%)",
-                 fontsize=13, fontweight="bold")
+    sns.heatmap(
+        heat,
+        annot=True,
+        fmt=".1f",
+        cmap="YlGnBu",
+        vmin=0,
+        vmax=100,
+        linewidths=0.5,
+        ax=ax,
+        annot_kws={"size": 11},
+    )
     ax.set_xlabel("Metric"); ax.set_ylabel("Subject")
     plt.tight_layout(); _save(fig, save_path, "summary_heatmap_all_metrics.png")
 
@@ -252,8 +266,6 @@ def plot_scatter_acc_f1(df: pd.DataFrame, save_path: str) -> None:
     ax.plot(lim, lim, "k--", alpha=0.3, linewidth=1)
     ax.set_xlabel("Accuracy (%)", fontsize=12)
     ax.set_ylabel("F1-Score (%)", fontsize=12)
-    ax.set_title("Accuracy vs. F1-Score per Subject",
-                 fontsize=13, fontweight="bold")
     ax.grid(True, alpha=0.3); plt.tight_layout()
     _save(fig, save_path, "summary_scatter_acc_f1.png")
 
@@ -270,8 +282,6 @@ def plot_scatter_prec_rec(df: pd.DataFrame, save_path: str) -> None:
     ax.plot(lim, lim, "k--", alpha=0.3, linewidth=1, label="Precision = Recall")
     ax.set_xlabel("Precision (%)", fontsize=12)
     ax.set_ylabel("Recall (%)", fontsize=12)
-    ax.set_title("Precision vs. Recall per Subject",
-                 fontsize=13, fontweight="bold")
     ax.legend(); ax.grid(True, alpha=0.3); plt.tight_layout()
     _save(fig, save_path, "summary_scatter_prec_rec.png")
 
@@ -287,9 +297,8 @@ def plot_above_chance(df: pd.DataFrame, save_path: str) -> None:
                 f"+{v:.1f}%", ha="center", va="bottom", fontsize=9)
     ax.axhline(0, color="black", linewidth=1.2)
     ax.set_xticks(x); ax.set_xticklabels(df["label"], fontsize=11)
-    ax.set_xlabel("Subject"); ax.set_ylabel("Accuracy above random chance (%)")
-    ax.set_title("Improvement Over 25% Random-Chance Baseline",
-                 fontsize=13, fontweight="bold")
+    ax.set_xlabel("Subject")
+    ax.set_ylabel("Accuracy above random chance (%)")
     ax.grid(axis="y", alpha=0.3); plt.tight_layout()
     _save(fig, save_path, "summary_above_chance.png")
 
@@ -297,10 +306,17 @@ def plot_above_chance(df: pd.DataFrame, save_path: str) -> None:
 def plot_corr_matrix(df: pd.DataFrame, save_path: str) -> None:
     corr = df[METRICS].corr()
     fig, ax = plt.subplots(figsize=(6, 5))
-    sns.heatmap(corr, annot=True, fmt=".2f", cmap="coolwarm",
-                vmin=-1, vmax=1, linewidths=0.5, ax=ax, annot_kws={"size": 12})
-    ax.set_title("Pearson Correlation Between Metrics",
-                 fontsize=13, fontweight="bold")
+    sns.heatmap(
+        corr,
+        annot=True,
+        fmt=".2f",
+        cmap="coolwarm",
+        vmin=-1,
+        vmax=1,
+        linewidths=0.5,
+        ax=ax,
+        annot_kws={"size": 12},
+    )
     plt.tight_layout(); _save(fig, save_path, "summary_corr_matrix.png")
 
 
@@ -325,13 +341,11 @@ def plot_radar_individual(df: pd.DataFrame, save_path: str) -> None:
         ax.fill(angles, vals, alpha=0.2, color=PALETTE[idx % 9])
         ax.set_thetagrids(np.degrees(angles[:-1]),
                           [m.capitalize() for m in METRICS], fontsize=9)
-        ax.set_ylim(0, 1); ax.set_title(row["label"], fontsize=12, fontweight="bold")
+        ax.set_ylim(0, 1)
         ax.set_yticks([0.25, 0.5, 0.75, 1.0])
         ax.set_yticklabels(["25%", "50%", "75%", "100%"], fontsize=7)
     for ax in axes[n:]:
         ax.set_visible(False)
-    plt.suptitle("Per-Subject Metrics — Individual Radar Charts",
-                 fontsize=14, fontweight="bold")
     plt.tight_layout(); _save(fig, save_path, "radar_chart.png")
 
 
@@ -348,8 +362,6 @@ def plot_radar_overlay(df: pd.DataFrame, save_path: str) -> None:
                       [m.capitalize() for m in METRICS], fontsize=12)
     ax.set_ylim(0, 1); ax.set_yticks([0.25, 0.5, 0.75, 1.0])
     ax.set_yticklabels(["25%", "50%", "75%", "100%"], fontsize=9)
-    ax.set_title("All Subjects Overlaid — Radar Chart",
-                 fontsize=14, fontweight="bold", pad=20)
     ax.legend(loc="upper right", bbox_to_anchor=(1.35, 1.15), fontsize=10)
     ax.grid(True, alpha=0.35)
     plt.tight_layout(); _save(fig, save_path, "radar_chart_overlay.png")
@@ -370,9 +382,6 @@ def plot_cross_heatmap(matrix: pd.DataFrame, metric: str, save_path: str) -> Non
                                    edgecolor="blue", lw=2.5))
     ax.set_xlabel("Test Subject",  fontsize=12)
     ax.set_ylabel("Train Subject", fontsize=12)
-    ax.set_title(f"Cross-Subject {metric.capitalize()} (%)\n"
-                 "(blue border = in-subject; off-diagonal = cross-subject)",
-                 fontsize=13, fontweight="bold")
     plt.tight_layout(); _save(fig, save_path, Path(save_path).name)
 
 
@@ -393,9 +402,8 @@ def plot_cross_row_mean(acc_matrix: pd.DataFrame, save_path: str) -> None:
     for bar, v in zip(bars, row_means):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3,
                 f"{v:.1f}%", ha="center", fontsize=9)
-    ax.set_xlabel("Train Subject"); ax.set_ylabel("Mean Cross-Subject Accuracy (%)")
-    ax.set_title("Mean Transferability by Train Subject",
-                 fontsize=13, fontweight="bold")
+    ax.set_xlabel("Train Subject")
+    ax.set_ylabel("Mean Cross-Subject Accuracy (%)")
     ax.set_ylim(0, 80); ax.legend(); ax.grid(axis="y", alpha=0.3)
     plt.tight_layout(); _save(fig, save_path, "cross_subject_row_mean.png")
 
@@ -417,9 +425,8 @@ def plot_cross_col_mean(acc_matrix: pd.DataFrame, save_path: str) -> None:
     for bar, v in zip(bars, col_means):
         ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.3,
                 f"{v:.1f}%", ha="center", fontsize=9)
-    ax.set_xlabel("Test Subject"); ax.set_ylabel("Mean Cross-Subject Accuracy (%)")
-    ax.set_title("Mean Recognisability by Test Subject",
-                 fontsize=13, fontweight="bold")
+    ax.set_xlabel("Test Subject")
+    ax.set_ylabel("Mean Cross-Subject Accuracy (%)")
     ax.set_ylim(0, 80); ax.legend(); ax.grid(axis="y", alpha=0.3)
     plt.tight_layout(); _save(fig, save_path, "cross_subject_col_mean.png")
 
@@ -443,10 +450,17 @@ def plot_class_heatmap(classwise: dict[int, dict], metric_key: str,
         print(f"  [skip] {title} heatmap — no data")
         return
     fig, ax = plt.subplots(figsize=(9, max(4, len(df) * 0.55 + 1.5)))
-    sns.heatmap(df * 100, annot=True, fmt=".1f", cmap="RdYlGn",
-                vmin=0, vmax=100, linewidths=0.5, ax=ax, annot_kws={"size": 11})
-    ax.set_title(f"Per-Class {title} (%) by Subject",
-                 fontsize=13, fontweight="bold")
+    sns.heatmap(
+        df * 100,
+        annot=True,
+        fmt=".1f",
+        cmap="RdYlGn",
+        vmin=0,
+        vmax=100,
+        linewidths=0.5,
+        ax=ax,
+        annot_kws={"size": 11},
+    )
     ax.set_xlabel("MI Class"); ax.set_ylabel("Subject")
     plt.tight_layout(); _save(fig, save_path, Path(save_path).name)
 
@@ -465,9 +479,8 @@ def plot_class_bar_per_subject(classwise: dict[int, dict], subject: int,
         ax.bar(x + (i - 1) * width, vals, width, label=label,
                color=list(METRIC_COLOURS.values())[i + 1], edgecolor="white")
     ax.set_xticks(x); ax.set_xticklabels(CLASS_NAMES, fontsize=10)
-    ax.set_xlabel("MI Class"); ax.set_ylabel("Score (%)")
-    ax.set_title(f"Subject S{subject:02d} — Per-Class Metrics",
-                 fontsize=13, fontweight="bold")
+    ax.set_xlabel("MI Class")
+    ax.set_ylabel("Score (%)")
     ax.set_ylim(0, 115); ax.legend(); ax.grid(axis="y", alpha=0.3)
     plt.tight_layout(); _save(fig, save_path, Path(save_path).name)
 
@@ -486,9 +499,8 @@ def plot_class_stacked_bar(classwise: dict[int, dict], save_path: str) -> None:
         ax.bar(df_pct.index, vals, bottom=bottom,
                label=cn, color=PALETTE_CLASSES[j], edgecolor="white", linewidth=0.5)
         bottom += vals
-    ax.set_xlabel("Subject"); ax.set_ylabel("Cumulative Recall (%)")
-    ax.set_title("Stacked Per-Class Recall Across Subjects",
-                 fontsize=13, fontweight="bold")
+    ax.set_xlabel("Subject")
+    ax.set_ylabel("Cumulative Recall (%)")
     ax.legend(loc="upper right"); ax.grid(axis="y", alpha=0.3)
     plt.tight_layout(); _save(fig, save_path, "class_stacked_bar.png")
 
@@ -503,9 +515,8 @@ def plot_history_overlay(histories: dict[int, pd.DataFrame],
         if col in h.columns:
             ax.plot(h[col] * 100, label=f"S{s:02d}",
                     color=PALETTE[s - 1], linewidth=1.5, alpha=0.8)
-    ax.set_xlabel("Epoch"); ax.set_ylabel(f"{title} (%)")
-    ax.set_title(f"All Subjects — {title} per Epoch",
-                 fontsize=13, fontweight="bold")
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel(f"{title} (%)")
     ax.legend(ncol=3, fontsize=9); ax.grid(True, alpha=0.25)
     plt.tight_layout(); _save(fig, save_path, Path(save_path).name)
 
@@ -520,9 +531,8 @@ def plot_history_loss_overlay(histories: dict[int, pd.DataFrame],
         if col in h.columns:
             ax.plot(h[col], label=f"S{s:02d}",
                     color=PALETTE[s - 1], linewidth=1.5, alpha=0.8)
-    ax.set_xlabel("Epoch"); ax.set_ylabel(title)
-    ax.set_title(f"All Subjects — {title} per Epoch",
-                 fontsize=13, fontweight="bold")
+    ax.set_xlabel("Epoch")
+    ax.set_ylabel(title)
     ax.legend(ncol=3, fontsize=9); ax.grid(True, alpha=0.25)
     plt.tight_layout(); _save(fig, save_path, Path(save_path).name)
 
@@ -537,24 +547,35 @@ def plot_history_grid(histories: dict[int, pd.DataFrame],
     subjects = sorted(histories.keys())
     n = len(subjects)
     ncols = min(n, 3); nrows = (n + ncols - 1) // ncols
-    fig, axes = plt.subplots(nrows, ncols, figsize=(6 * ncols, 4 * nrows))
-    axes = np.array(axes).flatten()
+    fig = plt.figure(figsize=(18, 14), facecolor="white")
+    gs = gridspec.GridSpec(nrows, ncols, figure=fig, hspace=0.50, wspace=0.38)
     for idx, s in enumerate(subjects):
-        ax = axes[idx]; h = histories[s]
+        ax = fig.add_subplot(gs[idx // ncols, idx % ncols])
+        h = histories[s]
         scale = 100 if is_pct else 1
         if col in h.columns:
             ax.plot(h[col] * scale, label="Train", color=PALETTE[s - 1], linewidth=2)
         if val_col in h.columns:
-            ax.plot(h[val_col] * scale, label="Val", color=PALETTE[s - 1],
-                    linewidth=2, linestyle="--", alpha=0.7)
-        ax.set_title(f"Subject S{s:02d}", fontsize=11, fontweight="bold")
+            ax.plot(
+                h[val_col] * scale,
+                label="Val",
+                color=PALETTE[s - 1],
+                linewidth=2,
+                linestyle="--",
+                alpha=0.7,
+            )
         ax.set_xlabel("Epoch"); ax.set_ylabel(ylabel)
         ax.legend(fontsize=8); ax.grid(True, alpha=0.25)
-        if is_pct: ax.set_ylim(0, 1.05)
-    for ax in axes[n:]:
-        ax.set_visible(False)
-    plt.suptitle(title, fontsize=14, fontweight="bold")
-    plt.tight_layout(); _save(fig, save_path, Path(save_path).name)
+        if is_pct:
+            ax.set_ylim(0.0, 1.05)
+    # Hide unused subplots
+    for idx in range(n, nrows * ncols):
+        fig.add_subplot(gs[idx // ncols, idx % ncols]).set_visible(False)
+    fig.savefig(
+        save_path, dpi=300, bbox_inches="tight", facecolor="white", edgecolor="none"
+    )
+    plt.close(fig)
+    print(f"  {Path(save_path).name}")
 
 
 def plot_history_individual(histories: dict[int, pd.DataFrame], subject: int,
@@ -574,9 +595,8 @@ def plot_history_individual(histories: dict[int, pd.DataFrame], subject: int,
         if val_key in h.columns:
             ax.plot(h[val_key] * scale, label="Val", color=PALETTE[subject - 1],
                     linewidth=2, linestyle="--", alpha=0.7)
-        ax.set_xlabel("Epoch"); ax.set_ylabel(ylabel)
-        ax.set_title(f"Subject S{subject:02d} — Training {ylabel}",
-                     fontsize=12, fontweight="bold")
+        ax.set_xlabel("Epoch")
+        ax.set_ylabel(ylabel)
         ax.legend(); ax.grid(True, alpha=0.3)
         if is_pct: ax.set_ylim(0, 1.05)
         fname = save_dir / f"history_s{subject:02d}_{suffix}.png"
@@ -596,15 +616,18 @@ def plot_wgan_losses_all(logs: dict[int, pd.DataFrame], save_path: str) -> None:
             col = PALETTE[s - 1]
             axes[0, cls].plot(df["epoch"], df["critic_loss"],
                               label=f"S{s}", color=col, linewidth=1.2, alpha=0.8)
-            axes[1, cls].plot(df["epoch"], df["generator_loss"],
-                              label=f"S{s}", color=col, linewidth=1.2, alpha=0.8)
-        axes[0, cls].set_title(f"{CLASS_NAMES[cls]}\nCritic Loss", fontsize=10)
-        axes[1, cls].set_title("Generator Loss", fontsize=10)
+            axes[1, cls].plot(
+                df["epoch"],
+                df["generator_loss"],
+                label=f"S{s}",
+                color=col,
+                linewidth=1.2,
+                alpha=0.8,
+            )
         for ax in axes[:, cls]:
             ax.set_xlabel("Epoch"); ax.set_ylabel("Loss")
-            ax.legend(fontsize=7, ncol=3); ax.grid(True, alpha=0.25)
-    plt.suptitle("WGAN-GP Losses — All Subjects & Classes",
-                 fontsize=14, fontweight="bold")
+            ax.legend(fontsize=7, ncol=3)
+            ax.grid(True, alpha=0.25)
     plt.tight_layout(); _save(fig, save_path, "wgan_losses_all.png")
 
 
@@ -624,10 +647,15 @@ def plot_wgan_final_heatmap(logs: dict[int, pd.DataFrame],
                            index=[f"S{s}" for s in subjects],
                            columns=CLASS_NAMES)
     fig, ax = plt.subplots(figsize=(8, max(4, len(subjects) * 0.55 + 1.5)))
-    sns.heatmap(df_heat, annot=True, fmt=".2f", cmap="coolwarm_r",
-                linewidths=0.5, ax=ax, annot_kws={"size": 11})
-    ax.set_title(f"WGAN Final {title} by Subject × Class",
-                 fontsize=13, fontweight="bold")
+    sns.heatmap(
+        df_heat,
+        annot=True,
+        fmt=".2f",
+        cmap="coolwarm_r",
+        linewidths=0.5,
+        ax=ax,
+        annot_kws={"size": 11},
+    )
     ax.set_xlabel("MI Class"); ax.set_ylabel("Subject")
     plt.tight_layout(); _save(fig, save_path, Path(save_path).name)
 
@@ -642,11 +670,13 @@ def plot_wgan_individual(logs: dict[int, pd.DataFrame],
         return
     fig, axes = plt.subplots(1, 2, figsize=(11, 4))
     axes[0].plot(df["epoch"], df["critic_loss"], color=PALETTE[subject - 1], linewidth=1.5)
-    axes[0].set_title("Critic Loss"); axes[0].set_xlabel("Epoch"); axes[0].grid(True, alpha=0.3)
+    axes[0].set_ylabel("Critic Loss")
+    axes[0].set_xlabel("Epoch")
+    axes[0].grid(True, alpha=0.3)
     axes[1].plot(df["epoch"], df["generator_loss"], color=PALETTE_CLASSES[cls], linewidth=1.5)
-    axes[1].set_title("Generator Loss"); axes[1].set_xlabel("Epoch"); axes[1].grid(True, alpha=0.3)
-    plt.suptitle(f"S{subject:02d} — Class {cls}: {CLASS_NAMES[cls]} — WGAN-GP",
-                 fontsize=12, fontweight="bold")
+    axes[1].set_ylabel("Generator Loss")
+    axes[1].set_xlabel("Epoch")
+    axes[1].grid(True, alpha=0.3)
     plt.tight_layout()
     fname = save_dir / f"wgan_s{subject:02d}_class{cls}.png"
     _save(fig, str(fname), fname.name)
@@ -670,12 +700,14 @@ def plot_synthetic_samples(subject: int, save_dir: Path) -> None:
             for col, ci in enumerate(chosen):
                 img = X_syn[ci, :, :, 0]  
                 ax  = axes[cls, col]
-                ax.imshow(img, aspect="auto", origin="lower",
-                          cmap="viridis", interpolation="nearest")
-                ax.set_title(f"{CLASS_NAMES[cls]}\nSample {col+1}", fontsize=9)
+                ax.imshow(
+                    img,
+                    aspect="auto",
+                    origin="lower",
+                    cmap="viridis",
+                    interpolation="nearest",
+                )
                 ax.axis("off")
-        plt.suptitle(f"Subject S{subject:02d} — Synthetic CWT Scalograms (Channel Fz)",
-                     fontsize=13, fontweight="bold")
         plt.tight_layout()
         fname = save_dir / f"synthetic_samples_s{subject:02d}.png"
         _save(fig, str(fname), fname.name)
@@ -694,13 +726,11 @@ def plot_synthetic_class_mean(subject: int, save_dir: Path) -> None:
         idx  = np.where(y_syn == cls)[0]
         mean = X_syn[idx].mean(axis=0)[:, :, 0]  
         ax   = axes[cls]
-        im   = ax.imshow(mean, aspect="auto", origin="lower",
-                         cmap="hot", interpolation="nearest")
-        ax.set_title(CLASS_NAMES[cls], fontsize=11, fontweight="bold")
+        im = ax.imshow(
+            mean, aspect="auto", origin="lower", cmap="hot", interpolation="nearest"
+        )
         ax.set_xlabel("Time"); ax.set_ylabel("Scale")
         plt.colorbar(im, ax=ax, fraction=0.046)
-    plt.suptitle(f"Subject S{subject:02d} — Mean Synthetic CWT per Class",
-                 fontsize=13, fontweight="bold")
     plt.tight_layout()
     fname = save_dir / f"synthetic_class_mean_s{subject:02d}.png"
     _save(fig, str(fname), fname.name)
@@ -719,8 +749,6 @@ def plot_synthetic_distribution(subjects: List[int], save_path: str) -> None:
     vals = np.concatenate(all_vals)
     fig, axes = plt.subplots(1, 2, figsize=(12, 4))
     axes[0].hist(vals, bins=100, color="#2196F3", alpha=0.8, edgecolor="none")
-    axes[0].set_title("Synthetic CWT Value Distribution",
-                      fontsize=12, fontweight="bold")
     axes[0].set_xlabel("Normalised CWT magnitude"); axes[0].set_ylabel("Count")
     axes[0].grid(axis="y", alpha=0.3)
     # KDE
@@ -729,11 +757,8 @@ def plot_synthetic_distribution(subjects: List[int], save_path: str) -> None:
     xs  = np.linspace(vals.min(), vals.max(), 300)
     axes[1].plot(xs, kde(xs), color="#9C27B0", linewidth=2)
     axes[1].fill_between(xs, kde(xs), alpha=0.3, color="#9C27B0")
-    axes[1].set_title("Synthetic CWT Density (KDE)",
-                      fontsize=12, fontweight="bold")
     axes[1].set_xlabel("Normalised CWT magnitude"); axes[1].set_ylabel("Density")
     axes[1].grid(True, alpha=0.3)
-    plt.suptitle("Distribution of Synthetic Data Values", fontsize=13)
     plt.tight_layout(); _save(fig, save_path, "synthetic_distribution.png")
 
 
@@ -897,4 +922,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

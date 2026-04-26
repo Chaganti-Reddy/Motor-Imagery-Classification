@@ -93,8 +93,9 @@ def plot_grouped_bar(df: pd.DataFrame) -> None:
                  fontsize=13, fontweight="bold")
     ax.set_ylim(0, 110); ax.legend(); ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "ablation_accuracy_grouped.png"),
-                dpi=150, bbox_inches="tight")
+    fig.savefig(
+        str(FIGURES_DIR / "ablation_accuracy_grouped.png"), dpi=300, bbox_inches="tight"
+    )
     plt.close(fig); print(f"  → ablation_accuracy_grouped.png")
 
 
@@ -118,8 +119,7 @@ def plot_delta(df: pd.DataFrame) -> None:
                  fontsize=12, fontweight="bold")
     ax.legend(); ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "ablation_delta.png"),
-                dpi=150, bbox_inches="tight")
+    fig.savefig(str(FIGURES_DIR / "ablation_delta.png"), dpi=300, bbox_inches="tight")
     plt.close(fig); print(f"  → ablation_delta.png")
 
 
@@ -137,8 +137,9 @@ def plot_f1(df: pd.DataFrame) -> None:
                  fontsize=12, fontweight="bold")
     ax.set_ylim(0, 110); ax.legend(); ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "ablation_f1_grouped.png"),
-                dpi=150, bbox_inches="tight")
+    fig.savefig(
+        str(FIGURES_DIR / "ablation_f1_grouped.png"), dpi=300, bbox_inches="tight"
+    )
     plt.close(fig); print(f"  → ablation_f1_grouped.png")
 
 
@@ -157,8 +158,7 @@ def plot_scatter(df: pd.DataFrame) -> None:
     ax.set_title("Ablation: Synthetic Augmentation Effect\n(above diagonal = improvement)")
     ax.legend(); ax.grid(alpha=0.3)
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "ablation_scatter.png"),
-                dpi=150, bbox_inches="tight")
+    fig.savefig(str(FIGURES_DIR / "ablation_scatter.png"), dpi=300, bbox_inches="tight")
     plt.close(fig); print(f"  → ablation_scatter.png")
 
 

@@ -111,7 +111,9 @@ def plot_band_accuracy_heatmap(df: pd.DataFrame) -> None:
     ax.set_title("Band Discriminability — Logistic Probe Accuracy\n(chance = 0.25)")
     ax.set_xlabel("Frequency Band"); ax.set_ylabel("Subject")
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "band_accuracy_heatmap.png"), dpi=150, bbox_inches="tight")
+    fig.savefig(
+        str(FIGURES_DIR / "band_accuracy_heatmap.png"), dpi=300, bbox_inches="tight"
+    )
     plt.close(fig); print(f"  → band_accuracy_heatmap.png")
 
 
@@ -129,7 +131,9 @@ def plot_band_accuracy_lines(df: pd.DataFrame) -> None:
     ax.set_title("Frequency Band Discriminability per Subject")
     ax.legend(ncol=3, fontsize=8); ax.grid(alpha=0.3)
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "band_accuracy_lines.png"), dpi=150, bbox_inches="tight")
+    fig.savefig(
+        str(FIGURES_DIR / "band_accuracy_lines.png"), dpi=300, bbox_inches="tight"
+    )
     plt.close(fig); print(f"  → band_accuracy_lines.png")
 
 
@@ -147,7 +151,9 @@ def plot_mean_band_bar(df: pd.DataFrame) -> None:
     ax.set_title("Average Discriminability by Frequency Band")
     ax.legend(); ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "band_accuracy_mean.png"), dpi=150, bbox_inches="tight")
+    fig.savefig(
+        str(FIGURES_DIR / "band_accuracy_mean.png"), dpi=300, bbox_inches="tight"
+    )
     plt.close(fig); print(f"  → band_accuracy_mean.png")
 
 
@@ -168,7 +174,7 @@ def plot_freq_scale_map() -> None:
     ax.legend(loc="upper right", fontsize=8); ax.set_xlim(0, 50)
     ax.grid(axis="x", alpha=0.3)
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "freq_scale_map.png"), dpi=150, bbox_inches="tight")
+    fig.savefig(str(FIGURES_DIR / "freq_scale_map.png"), dpi=300, bbox_inches="tight")
     plt.close(fig); print(f"  → freq_scale_map.png")
 
 

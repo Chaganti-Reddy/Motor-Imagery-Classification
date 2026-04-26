@@ -105,7 +105,7 @@ def plot_fid_per_class(df: pd.DataFrame) -> None:
     ax.set_title("Per-Class FID Score: Real vs Synthetic CWT")
     ax.legend(title="Class"); ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "fid_per_class.png"), dpi=150, bbox_inches="tight")
+    fig.savefig(str(FIGURES_DIR / "fid_per_class.png"), dpi=300, bbox_inches="tight")
     plt.close(fig); print(f"  → fid_per_class.png")
 
 
@@ -116,14 +116,15 @@ def plot_fid_mean(df: pd.DataFrame) -> None:
     ax.set_xticks(range(len(df)))
     ax.set_xticklabels([f"S{s:02d}" for s in df["subject"]])
     ax.set_xlabel("Subject"); ax.set_ylabel("Mean FID (lower = better)")
-    ax.set_title("Mean FID Score per Subject (All Classes)")
     for bar, val in zip(bars, df["fid_mean"]):
         ax.text(bar.get_x() + bar.get_width() / 2,
                 bar.get_height() + 0.5, f"{val:.1f}",
                 ha="center", va="bottom", fontsize=9)
     ax.grid(axis="y", alpha=0.3)
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "fid_mean_per_subject.png"), dpi=150, bbox_inches="tight")
+    fig.savefig(
+        str(FIGURES_DIR / "fid_mean_per_subject.png"), dpi=300, bbox_inches="tight"
+    )
     plt.close(fig); print(f"  → fid_mean_per_subject.png")
 
 
@@ -136,7 +137,7 @@ def plot_fid_heatmap(df: pd.DataFrame) -> None:
     ax.set_title("FID Score Heatmap (lower = better synthetic quality)")
     ax.set_xlabel("Class"); ax.set_ylabel("Subject")
     fig.tight_layout()
-    fig.savefig(str(FIGURES_DIR / "fid_heatmap.png"), dpi=150, bbox_inches="tight")
+    fig.savefig(str(FIGURES_DIR / "fid_heatmap.png"), dpi=300, bbox_inches="tight")
     plt.close(fig); print(f"  → fid_heatmap.png")
 
 

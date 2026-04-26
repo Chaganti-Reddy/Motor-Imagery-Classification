@@ -83,7 +83,7 @@ def plot_confusion_matrix(
     ax.set_title(title,              fontsize=13)
     plt.tight_layout()
     if save_path:
-        plt.savefig(save_path, dpi=150)
+        plt.savefig(save_path, dpi=300)
         print(f"  Confusion matrix → {save_path}")
     plt.show()
     plt.close()
@@ -113,7 +113,7 @@ def plot_training_history(
 
     plt.tight_layout()
     if save_path:
-        plt.savefig(save_path, dpi=150)
+        plt.savefig(save_path, dpi=300)
         print(f"  Training history → {save_path}")
     plt.show()
     plt.close()
@@ -142,7 +142,7 @@ def plot_wgan_losses(
     plt.suptitle(f"WGAN-GP Training Losses — Subject {subject}", fontsize=13)
     plt.tight_layout()
     if save_path:
-        plt.savefig(save_path, dpi=150)
+        plt.savefig(save_path, dpi=300)
         print(f"  WGAN loss curves → {save_path}")
     plt.show()
     plt.close()
